@@ -2,14 +2,12 @@ from transformers import AutoTokenizer, pipeline
 
 
 def chunk_text(text, tokenizer, max_tokens=512):
-    """Splits text into chunks based on token count instead of word count."""
     tokens = tokenizer.encode(text, truncation=False)
     chunks = [tokens[i : i + max_tokens] for i in range(0, len(tokens), max_tokens)]
     return [tokenizer.decode(chunk, skip_special_tokens=True) for chunk in chunks]
 
 
 def summarizer(text, max_length=150, min_length=50):
-    """Summarizes the given text using a pre-trained abstractive summarization model."""
     summarization_pipeline = pipeline("summarization", model="facebook/bart-large-cnn")
     tokenizer = AutoTokenizer.from_pretrained("facebook/bart-large-cnn")
 
@@ -24,7 +22,7 @@ def summarizer(text, max_length=150, min_length=50):
 
         if token_count < min_length:
             print(f"Skipping chunk {i + 1} due to low token count.")
-            continue  # Skip extremely short chunks
+            continue
 
         try:
             summary = summarization_pipeline(
@@ -39,7 +37,7 @@ def summarizer(text, max_length=150, min_length=50):
 
 def main():
     path = "Superman & Lois (2021) - S01E01 - Pilot.en.srt_cleaned.txt"
-    output_path = "summary_output.txt"  # File to save the summary
+    output_path = "summary_output.txt"
 
     try:
         with open(path, "r", encoding="utf-8") as file:
@@ -48,7 +46,6 @@ def main():
         summary = summarizer(text)
         print("\nFinal Summary:\n", summary)
 
-        # Save the summary to a file
         with open(output_path, "w", encoding="utf-8") as output_file:
             output_file.write(summary)
         print(f"\nSummary saved to '{output_path}'.")
